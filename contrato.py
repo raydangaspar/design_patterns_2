@@ -39,3 +39,68 @@ class Contrato:
             self.__tipo = 'ACERTADO'
         elif self.__tipo == 'ACERTADO':
             self.__tipo = 'CONCLUIDO'
+
+    def salva_estado(self):
+        return Estado(
+            Contrato(
+                data=self.__data,
+                cliente=self.__cliente,
+                tipo=self.__tipo
+            )
+        )
+
+    def restaura_estado(self, estado):
+        self.__cliente = estado.contrato.cliente
+        self.__data = estado.contrato.data
+        self.__tipo = estado.contrato.tipo
+
+
+class Estado:
+
+    def __init__(self, contrato):
+        self.__contrato = contrato
+
+    @property
+    def contrato(self):
+        return self.__contrato
+
+
+class Historico:
+
+    def __init__(self):
+        self.__estados_salvos = []
+
+    def obtem_estado(self, indice):
+        return self.__estados_salvos[indice]
+
+    def adiciona_estado(self, estado):
+        self.__estados_salvos.append(estado)
+
+
+if __name__ == '__main__':
+    historico = Historico()
+
+    contrato = Contrato(
+        data=date.today(), cliente='Raydan Gaspar', tipo='NOVO'
+    )
+
+    contrato.avanca()
+
+    historico.adiciona_estado(contrato.salva_estado())
+
+    contrato.avanca()
+
+    contrato.cliente = 'João da Silva'
+    historico.adiciona_estado(contrato.salva_estado())
+
+    contrato.avanca()
+
+    historico.adiciona_estado(contrato.salva_estado())
+
+    print(contrato.tipo)
+    print(contrato.cliente)
+
+    contrato.restaura_estado(historico.obtem_estado(0))
+
+    print(contrato.tipo)
+    print(contrato.cliente)
